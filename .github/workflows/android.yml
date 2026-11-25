@@ -1,0 +1,44 @@
+
+name: Construir Enos APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'EnosMusic_source.zip'
+      - '.github/workflows/android.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Obter código
+        uses: actions/checkout@v4
+
+      - name: Extrair projeto
+        run: |
+          unzip -o EnosMusic_source.zip
+
+      - name: Compilar Enos
+        run: gradle -p EnosMusic assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Enos-APK
+          path: EnosMusic/app/build/outputs/apk/debug/app-debug.apk
